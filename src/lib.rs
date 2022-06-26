@@ -10,9 +10,9 @@ pub fn parse_into_base64(a: &[u8]) -> String {
             index = 0; 
             let v1 = parse_6bit(c[0] >> 2).unwrap(); 
             ans.push(v1); 
-            let v1 = parse_6bit(((c[0] & 0x3) << 4) | ((c[1] & 0xf0) >> 4)).unwrap(); 
+            let v1 = parse_6bit(((c[0] & 0x3) << 4) | (c[1] >> 4)).unwrap(); 
             ans.push(v1); 
-            let v1 = parse_6bit(((c[1] & 0xf) << 2) | ((c[2] & 0xc) >> 6)).unwrap(); 
+            let v1 = parse_6bit(((c[1] & 0xf) << 2) | (c[2] >> 6)).unwrap(); 
             ans.push(v1); 
             let v1 = parse_6bit(c[2] & 0x3f).unwrap(); 
             ans.push(v1); 
@@ -52,7 +52,14 @@ pub fn parse_from_base64(a: &[u8]) -> Vec<u8> {
         if v == '=' as u8 {
             break; 
         }
-        c[index] = v; 
+        c[index] = match v {
+            v if v >= 'A' as u8 && v <= 'Z' as u8 => v - 'A' as u8, 
+            v if v >= 'a' as u8 && v <= 'z' as u8 => v - 'a' as u8 + 26, 
+            v if v >= '0' as u8 && v <= '9' as u8 => v - '0' as u8 + 52, 
+            v if v == '+' as u8 => 62, 
+            v if v == '/' as u8 => 63, 
+            _ => panic!("Invalid Base64 Character"), 
+        };
         if index == 3 {
             index = 0; 
             ans.push((c[0] << 2) | (c[1] >> 4)); 
@@ -63,17 +70,13 @@ pub fn parse_from_base64(a: &[u8]) -> Vec<u8> {
         }
     }
     match index {
+        0 => (), 
         1 => panic!("Why you get an error base64 str? "), 
         2 => ans.push((c[0] << 2) | (c[1] >> 4)), 
         3 => {
             ans.push((c[0] << 2) | (c[1] >> 4)); 
             ans.push((c[1] << 4) | (c[2] >> 2)); 
         }
-        // 4 => {
-        //     ans.push((c[0] << 2) | (c[1] >> 4)); 
-        //     ans.push((c[1] << 4) | (c[2] >> 2)); 
-        //     ans.push((c[2] << 6) | c[3]); 
-        // }
         _ => panic!("Amazing val!"), 
     }
     // String::from_utf8(ans).ok() 
