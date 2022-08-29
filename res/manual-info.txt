@@ -1,0 +1,19 @@
+OVERVIEW: Base64Parse Manual
+
+USAGE: base64parse [options] file...
+
+OPTIONS: 
+    -h,--help
+        Print the manual. 
+    -r,--raw
+        Raw Mode. In this mode, you just directly make full use of the standard input stream to execute the base64 operator. 
+    -e,--encode 
+        Execute the base64 encoding operations. 
+    -d,--decode
+        Execute the base64 decoding operations. Especially, when the input char is unexpected, the related error would print out. 
+    -o,--output
+        Redirect the output stream to the related file. 
+    -v,--version
+        Print the version of the program. 
+    --no-newline
+        Ignore the ending new-line character. 
